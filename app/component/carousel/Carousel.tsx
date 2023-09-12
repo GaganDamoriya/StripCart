@@ -3,6 +3,7 @@
 import { truncateText } from "@/app/utils/truncateText";
 import { formatPrice } from "@/app/utils/formatPrice";
 
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Rating } from "@mui/material";
 
@@ -11,6 +12,8 @@ interface CarouselProps {
 }
 
 const Carousel: React.FC<CarouselProps> = ({ data }) => {
+  const { push } = useRouter();
+
   const productRating =
     data.reviews.reduce((sum: number, item: any) => sum + item.rating, 0) /
     data.reviews.length;
@@ -31,7 +34,13 @@ const Carousel: React.FC<CarouselProps> = ({ data }) => {
     text-center
     "
     >
-      <div key={data.id} className="flex flex-col  gap-1 w-full">
+      <div
+        key={data.id}
+        className="flex flex-col  gap-1 w-full"
+        onClick={() => {
+          push(`/product/${data.id}`);
+        }}
+      >
         <div className="aspect-square overflow-hidden relative">
           <Image
             fill
