@@ -4,6 +4,10 @@ import { useState } from "react";
 import { SubmitHandler, useForm, FieldValues } from "react-hook-form";
 import { Black_Ops_One } from "next/font/google";
 import { AiOutlineGoogle } from "react-icons/ai";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const blackOps = Black_Ops_One({ subsets: ["latin"], weight: ["400"] });
 
@@ -20,9 +24,34 @@ const RegisterForm = () => {
       password: "",
     },
   });
+  const router = useRouter();
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setisLoading(true);
-    console.log(data);
+    axios
+      .post("./api/register", data)
+      .then(() => {
+        toast.success("Account created");
+        signIn("credentials", {
+          email: data.email,
+          password: data.password,
+          redirect: false,
+        }).then((callback) => {
+          if (callback?.ok) {
+            router.push("./cart");
+            router.refresh();
+            toast.success("Successfully loggedIn");
+          }
+          if (callback?.error) {
+            toast.error(callback.error);
+          }
+        });
+      })
+      .catch(() => {
+        toast.error("Something Went wrong");
+      })
+      .finally(() => {
+        setisLoading(false);
+      });
   };
   return (
     <>
